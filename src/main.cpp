@@ -4,18 +4,18 @@
 #include <benchmark/benchmark.h>
 #include <thread>
 
+#include "print.h"
+
+// Tests declaration
+void MulErrRate( void );
+void Division( void );
+
 /**/
 int main( void ) {
-  auto maxD = 1/pow(2, 16);
-  std::printf("\x1b[38;2;0;255;0m!! %.8f !!\x1b[38;2;255;255;255m\n", maxD);
-  for (double x = 0; x < 1000; x += 0.01f) {
-    fixed_point<int32_t, 4> A{x}, B{x};
-    auto d = double(A * B) - double(x * x);
-    if (fabs(d) > 1)
-    //  std::printf("\x1b[38;2;255;0;0m%f - %.8f\x1b[38;2;255;255;255m\n", x, d);
-    //else
-      std::printf("%f - %.8f\n", x, d);
-  }
+  //MulErrRate();
+  Division();
+  //std::print("SDFSDLFKj");
+
   return 0;
 }
 
@@ -48,3 +48,30 @@ BENCHMARK(FloatPoint);
 BENCHMARK_MAIN();
 
 /**/
+
+// Tests
+
+// Multiplication error rate
+void MulErrRate( void ) {
+  auto maxD = 1/pow(2, 16);
+  Printf<2,0,255>("!! %.8f !!\n", maxD);
+
+  for (double x = 0; x < 100; x += 0.01f) {
+    fixed_point<int32_t, 4> A{x}, B{x};
+    auto d = double(A * B) - double(x * x);
+    if (fabs(d) > 1)
+    //  std::printf("\x1b[38;2;255;0;0m%f - %.8f\x1b[38;2;255;255;255m\n", x, d);
+    //else
+      std::printf("%f - %.8f\n", x, d);
+  }
+}
+
+// Division
+void Division( void ) {
+  fixed_point<int32_t, 16> A{5.0}, B{2.0};
+
+  auto d = A / B;
+
+  std::print("{} - {} - {}\n", double(A), double(B), double(d));
+  std::print("{} - {} - {}\n", A.BitsStr(), B.BitsStr(), d.BitsStr());
+}

@@ -4,7 +4,7 @@ set(CMAKE_TOOLCHAIN_FILE "X:/vcpkg/scripts/buildsystems/vcpkg.cmake" CACHE strin
 project(fixed_point)
 
 
-add_executable(${PROJECT_NAME} src/main.cpp "src/fixed_point_lib/fixed_point.h" "src/fixed_point_lib/meta.h")
+add_executable(${PROJECT_NAME} src/main.cpp "src/fixed_point_lib/fixed_point.h" "src/fixed_point_lib/meta.h" "src/print.h" )
 
 set_property(TARGET ${PROJECT_NAME} PROPERTY CXX_STANDARD 23)
 
