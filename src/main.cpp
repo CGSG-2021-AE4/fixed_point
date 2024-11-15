@@ -29,7 +29,17 @@ static void FixedPoint(benchmark::State& state) {
   fixed_point<uint32_t, 16> B{rand()};
   fixed_point<uint32_t, 16> C{rand()};
   for (auto _ : state) {
-     C = A + B;
+     C = A * B + C * A + B * C + A * B * C;
+  }
+  Bunny = float(C);
+}
+
+static void Uint(benchmark::State& state) {
+  uint32_t A{uint32_t(rand())};
+  uint32_t B{uint32_t(rand())};
+  uint32_t C{uint32_t(rand())};
+  for (auto _ : state) {
+     C = A * B + C * A + B * C + A * B * C;
   }
   Bunny = float(C);
 }
@@ -37,12 +47,13 @@ static void FixedPoint(benchmark::State& state) {
 static void FloatPoint(benchmark::State& state) {
   double A{double(rand())}, B{double(rand())}, C{double(rand())};
   for (auto _ : state) {
-    C = A * B;
+    C = A * B + C * A + B * C + A * B * C;
   }
   Bunny = float(C);
 }
 
 BENCHMARK(FixedPoint);
+BENCHMARK(Uint);
 BENCHMARK(FloatPoint);
 
 BENCHMARK_MAIN();

@@ -10,7 +10,7 @@
 // Shift has uint8 type because I do not expect it hight then 32
 // !!! Support for 8, 16, 32 types !!! no support for 64
 template<typename value_t, uint8_t FractionalShift> requires CheckValueT<value_t>
-  class fixed_point
+  struct fixed_point
   {
   private:
     value_t Value;
@@ -56,7 +56,7 @@ template<typename value_t, uint8_t FractionalShift> requires CheckValueT<value_t
       return Value & Mask;
     }
 
-    // Returns value in format like 010110101.10101101
+    // Returns value in format bin format like 010110101.10101101
     constexpr std::string BitsStr() const {
       auto bits = std::bitset<sizeof(value_t) * 8>(Value).to_string();
 
@@ -110,29 +110,11 @@ template<typename value_t, uint8_t FractionalShift> requires CheckValueT<value_t
       }
 
     constexpr fixed_point operator*( fixed_point Other ) const noexcept {
-      // Simple way "(Value * Other.Value) >> Shift" can overflow value_t so up to "Shift" higher bits could be lost
-      // Here every component is less then out value so there is no overflow
-      // But now it is slow because(if at debug dissambly is the same as at release) cpp does not store Value and Other.Value at registers and get them from memory several times
-
-      // 1
-      // value_t out = Value * (Other.Value >> Shift) + (Value >> Shift) * (Other.Value & Mask) + (((Value & Mask) * (Other.Value & Mask)) >> Shift);
-
-      // 2 (too big error rate)
-      //value_t out = ;
-      
-      // 3 (too big error rate)
-      // return Value * (Other.Value >> Shift) + ((Value * (Other.Value & Mask)) >> Shift);
-
-      //if constexpr (std::is_signed_v<value_t>)
-      //  out |= (Value & SignBitMask) ^ (Other.Value & SignBitMask);
-      //if constexpr ()
-       
       return ((bigger_value_t)Value * Other.Value) >> Shift;
     }
     
-    constexpr fixed_point operator*=( fixed_point Other ) const noexcept {
-      //Value = Value * (Other.Value >> Shift) + (Value >> Shift) * (Other.Value & Mask) + (((Value & Mask) * (Other.Value & Mask)) >> Shift);
-      return *this;
+    constexpr fixed_point operator*=( fixed_point Other ) noexcept {
+      return Value = ((bigger_value_t)Value * Other.Value) >> Shift;
     }
     
     // "/"
