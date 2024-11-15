@@ -8,7 +8,8 @@
 #include "meta.h"
 
 // Shift has uint8 type because I do not expect it hight then 32
-template<typename value_t, uint8_t FractionalShift> requires std::is_integral_v<value_t>
+// !!! Support for 8, 16, 32 types !!! no support for 64
+template<typename value_t, uint8_t FractionalShift> requires CheckValueT<value_t>
   class fixed_point
   {
   private:
@@ -18,6 +19,8 @@ template<typename value_t, uint8_t FractionalShift> requires std::is_integral_v<
     static constexpr value_t Mask = MaskFromShift<value_t, uint8_t, Shift>();
     static constexpr value_t FractionSize = Mask + 1; // Size of fraction part (for casting from float point)
     static constexpr value_t SignBitMask = 1 << (sizeof(value_t) * 8 - 1);
+
+    using bigger_value_t = double_size_t<value_t>::type;
 
     // Constructor from raw value
     explicit constexpr fixed_point( value_t NewValue ) noexcept :
@@ -112,18 +115,19 @@ template<typename value_t, uint8_t FractionalShift> requires std::is_integral_v<
       // But now it is slow because(if at debug dissambly is the same as at release) cpp does not store Value and Other.Value at registers and get them from memory several times
 
       // 1
-      value_t out = Value * (Other.Value >> Shift) + (Value >> Shift) * (Other.Value & Mask) + (((Value & Mask) * (Other.Value & Mask)) >> Shift);
+      // value_t out = Value * (Other.Value >> Shift) + (Value >> Shift) * (Other.Value & Mask) + (((Value & Mask) * (Other.Value & Mask)) >> Shift);
 
       // 2 (too big error rate)
-      // return (Value * Other.Value) >> Shift;
+      //value_t out = ;
       
       // 3 (too big error rate)
       // return Value * (Other.Value >> Shift) + ((Value * (Other.Value & Mask)) >> Shift);
 
-      if constexpr (std::is_signed_v<value_t>)
-        out |= (Value & SignBitMask) ^ (Other.Value & SignBitMask);
-
-      return out;
+      //if constexpr (std::is_signed_v<value_t>)
+      //  out |= (Value & SignBitMask) ^ (Other.Value & SignBitMask);
+      //if constexpr ()
+       
+      return ((bigger_value_t)Value * Other.Value) >> Shift;
     }
     
     constexpr fixed_point operator*=( fixed_point Other ) const noexcept {
@@ -140,11 +144,11 @@ template<typename value_t, uint8_t FractionalShift> requires std::is_integral_v<
       
       // Remove sign bit
       if constexpr (std::is_signed_v<value_t>)
-        out = (((Value & ~SignBitMask) << (Shift / 2)) / ((Other.Value & ~SignBitMask) << (Shift / 2)));
+        out = ((Value & ~SignBitMask) / (Other.Value & ~SignBitMask));
       else
         out = (Value / Other.Value) << Shift;
 
-      if constexpr (std::is_signed_v<value_t>)
+      if constexpr (std::is_signed_v<value_t>) 
         out |= (Value & SignBitMask) ^ (Other.Value & SignBitMask);
 
       return out;

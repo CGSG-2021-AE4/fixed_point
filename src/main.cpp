@@ -10,7 +10,7 @@
 void MulErrRate( void );
 void Division( void );
 
-/**/
+/** /
 int main( void ) {
   //MulErrRate();
   Division();
@@ -20,7 +20,7 @@ int main( void ) {
 }
 
 
-/** /
+/**/
 
 static volatile float Bunny = 0;
 
@@ -29,7 +29,7 @@ static void FixedPoint(benchmark::State& state) {
   fixed_point<uint32_t, 16> B{rand()};
   fixed_point<uint32_t, 16> C{rand()};
   for (auto _ : state) {
-     C = A * B;
+     C = A + B;
   }
   Bunny = float(C);
 }
