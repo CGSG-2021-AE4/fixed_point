@@ -33,9 +33,9 @@ template<typename in_t> requires CheckValueT<in_t>
     //using type = std::conditional_t<sizeof(in_t) == 32, uint32_t, int64_t>; // 8 to 16
     using type = std::conditional_t<sizeof(in_t) == 8,
                  std::conditional_t<sizeof(in_t) == 16,
-                 std::conditional_t<std::is_signed_v<in_t>, uint64_t, int64_t>,  // 32 to 64
-                 std::conditional_t<std::is_signed_v<in_t>, uint32_t, int32_t>>, // 16 to 32
-                 std::conditional_t<std::is_signed_v<in_t>, uint16_t, int16_t>>; // 8 to 16
+                 std::conditional_t<std::is_signed_v<in_t>, int16_t, uint16_t>, // 8 to 16
+                 std::conditional_t<std::is_signed_v<in_t>, int32_t, uint32_t>>, // 16 to 32
+                 std::conditional_t<std::is_signed_v<in_t>, int64_t, uint64_t>>;  // 32 to 64
   };
 
 #endif // __fixed_point_meta_h_

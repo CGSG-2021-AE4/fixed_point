@@ -110,7 +110,7 @@ template<typename value_t, uint8_t FractionalShift> requires CheckValueT<value_t
       }
 
     constexpr fixed_point operator*( fixed_point Other ) const noexcept {
-      return ((bigger_value_t)Value * Other.Value) >> Shift;
+      return fixed_point((value_t)(((bigger_value_t)Value * Other.Value) >> Shift));
     }
     
     constexpr fixed_point operator*=( fixed_point Other ) noexcept {
@@ -120,20 +120,14 @@ template<typename value_t, uint8_t FractionalShift> requires CheckValueT<value_t
     // "/"
 
     constexpr fixed_point operator/( fixed_point Other ) const noexcept {
-      value_t out;
+      //value_t out;
 
       // 1
-      
       // Remove sign bit
-      if constexpr (std::is_signed_v<value_t>)
-        out = ((Value & ~SignBitMask) / (Other.Value & ~SignBitMask));
-      else
-        out = (Value / Other.Value) << Shift;
+      // if constexpr (std::is_signed_v<value_t>) 
+      //   out |= (Value & SignBitMask) ^ (Other.Value & SignBitMask);
 
-      if constexpr (std::is_signed_v<value_t>) 
-        out |= (Value & SignBitMask) ^ (Other.Value & SignBitMask);
-
-      return out;
+      return fixed_point((value_t)(((bigger_value_t)Value << Shift) / Other.Value));
     }
   };
 

@@ -22,6 +22,9 @@ int main( void ) {
 
 /**/
 
+//#define TEST_EQUATION C = A * B + C * A + B * C + A * B * C
+#define TEST_EQUATION C = A / B
+
 static volatile float Bunny = 0;
 
 static void FixedPoint(benchmark::State& state) {
@@ -29,7 +32,7 @@ static void FixedPoint(benchmark::State& state) {
   fixed_point<uint32_t, 16> B{rand()};
   fixed_point<uint32_t, 16> C{rand()};
   for (auto _ : state) {
-     C = A * B + C * A + B * C + A * B * C;
+    TEST_EQUATION;
   }
   Bunny = float(C);
 }
@@ -39,7 +42,7 @@ static void Uint(benchmark::State& state) {
   uint32_t B{uint32_t(rand())};
   uint32_t C{uint32_t(rand())};
   for (auto _ : state) {
-     C = A * B + C * A + B * C + A * B * C;
+    TEST_EQUATION;
   }
   Bunny = float(C);
 }
@@ -47,7 +50,7 @@ static void Uint(benchmark::State& state) {
 static void FloatPoint(benchmark::State& state) {
   double A{double(rand())}, B{double(rand())}, C{double(rand())};
   for (auto _ : state) {
-    C = A * B + C * A + B * C + A * B * C;
+    TEST_EQUATION;
   }
   Bunny = float(C);
 }
@@ -79,9 +82,10 @@ void MulErrRate( void ) {
 
 // Division
 void Division( void ) {
-  fixed_point<int32_t, 16> A{5.0}, B{2.0};
+  fixed_point<uint32_t, 16> A{5.0}, B{2.0};
 
   auto d = A / B;
+
 
   std::print("{} - {} - {}\n", double(A), double(B), double(d));
   std::print("{} - {} - {}\n", A.BitsStr(), B.BitsStr(), d.BitsStr());
